@@ -4,17 +4,20 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Fallback to local development values if env vars are not set
-const defaultUrl = 'http://localhost:54321';
-const defaultAnonKey = 'your-anon-key';
+// Check if we have valid Supabase configuration
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase configuration. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.');
+}
 
-// Configure auth URL for local development
+// Use provided environment variables or throw an error if missing
 export const supabase = createClient(
-  supabaseUrl || defaultUrl, 
-  supabaseAnonKey || defaultAnonKey, 
+  supabaseUrl || '', 
+  supabaseAnonKey || '', 
   {
     auth: {
-      url: import.meta.env.VITE_SUPABASE_URL ? undefined : 'http://localhost:54326'
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
     }
   }
 );

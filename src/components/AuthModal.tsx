@@ -24,6 +24,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
     setLoading(true);
 
+    // Check if Supabase is properly configured
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      setError('Authentication service is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
@@ -50,7 +57,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       onClose();
       resetForm();
     } catch (error: any) {
-      setError(error.message);
+      // Provide more user-friendly error messages
+      if (error.message === 'Failed to fetch') {
+        setError('Unable to connect to authentication service. Please check your internet connection and try again.');
+      } else {
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }
